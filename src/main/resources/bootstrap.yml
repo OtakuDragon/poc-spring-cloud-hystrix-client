@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: poc-spring-cloud-hystrix-client
+server:
+  port: 8883
