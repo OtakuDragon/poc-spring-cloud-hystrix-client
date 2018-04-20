@@ -42,6 +42,35 @@ public class MockRemoteResource {
 		sleep(1500L);
 		return "result";
 	}
+	
+	//Método com fallback.
+	@HystrixCommand(fallbackMethod="getDataWithFallback")
+	public String getSlowDataWithFallback() {
+		return getSlowData();
+	}
+	
+	/**
+	 * O método de fallback deve estar na mesma classe e ter a mesma assinatura do método principal
+	 * caso o método receba parametros o método de fallback vai receber os mesmos parametros que 
+	 * a chamada original que falhou recebeu.
+	 */
+	public String getDataWithFallback() {
+		return "fallback result";
+	}
+	
+	/**
+	 * Por padrão todos os método anotados com @HystrixCommand que não configuram uma thread poll
+	 * entram na thread pool padrão que tem tamanho padrão de 10 threads, o que não segue o padrão
+	 * bulkhead já que um serviço lento pode bloquear todos as threads do pool e derrubar a aplicação inteira,
+	 * o exemplo abaixo mostra como configurar uma threadPool que só se aplica a um método, e como configura-la.
+	*/
+	@HystrixCommand(threadPoolKey = "myThreadPool1",//Identificador único da threadPool
+					threadPoolProperties = {@HystrixProperty(name="coreSize", value="30"), //Quantidade de threads disponiveis
+											@HystrixProperty(name="maxQueueSize", value="10")})//Quantidade de threads que podem ficar aguardando
+																							   //até que uma thread do pool libere sem retornar erro.
+	public String getDataWithBulkhead() {
+		return "ha! i have my own thread pool suckers!";
+	}
 
 	private void sleep(Long millis) {
 		try {

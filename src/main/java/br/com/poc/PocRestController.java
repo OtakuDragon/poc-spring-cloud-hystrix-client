@@ -28,6 +28,10 @@ public class PocRestController {
 			return mockRestResource.getCustomTimeoutData();
 		}
 		
+		if(speed.equals("fallback")){
+			return mockRestResource.getDataWithFallback();
+		}
+		
 		return null;
     }
 
