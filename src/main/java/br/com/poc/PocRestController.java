@@ -1,22 +1,34 @@
 package br.com.poc;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 
 @RestController
 public class PocRestController {
 
 	@Autowired
-	private RestTemplate restTemplate;
+	private MockRemoteResource mockRestResource;
 	
-	//Referencia poc poc-spring-cloud-eureka-client-2
-	@RequestMapping(method=RequestMethod.GET)
-    public String consumeService() {
-		return restTemplate.getForEntity("http://poc-spring-cloud-eureka-client-2/api", String.class).getBody();
+	
+	@RequestMapping(method=RequestMethod.GET, value="{speed}")
+    public String consumeService(@PathVariable(name="speed") String speed) {
+		if(speed.equals("fast")){
+			return mockRestResource.getFastData();
+		}
+		
+		if(speed.equals("slow")){
+			return mockRestResource.getSlowData();
+		}
+		
+		if(speed.equals("custom")){
+			return mockRestResource.getCustomTimeoutData();
+		}
+		
+		return null;
     }
-	
+
 }
