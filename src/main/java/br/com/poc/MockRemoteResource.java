@@ -2,6 +2,7 @@ package br.com.poc;
 
 import org.springframework.stereotype.Component;
 
+import com.netflix.hystrix.contrib.javanica.annotation.DefaultProperties;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 
@@ -19,6 +20,21 @@ import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
  *
  */
 @Component
+//Define propriedades hystrix a nivel de classe, todas as propriedades podem ser sobre escritas a nivel de método
+/*Configurações do circuit breaker
+ * circuitBreaker.requestVolumeThreshold é o Numero minimo de requisições que tem que acontecer dentro do tempo definido em
+ * metricsRollingStats.timeInMilliseconds para ativar o circuit breaker caso a porcentagem de erro seja maior do que
+ * circuitBreaker.errorThresholdPercentage, caso seja o circuit breaker vai bloquear todas as chamadas ao recurso pelo
+ * tempo definido em circuitBreaker.sleepWindowInMilliseconds, metricsRollingStats.numBuckets é o numero de vezes que
+ * o hystrix vai consultar o status das chamadas dentro da janela metricsRollingStats.timeInMilliseconds.
+ * 
+ * Mais informações e valores default em propriedadesHystrix.png
+**/
+@DefaultProperties(commandProperties={@HystrixProperty(name="circuitBreaker.requestVolumeThreshold", value="10"),  
+									  @HystrixProperty(name="circuitBreaker.errorThresholdPercentage", value="75"),
+									  @HystrixProperty(name="circuitBreaker.sleepWindowInMilliseconds", value="7000"),
+									  @HystrixProperty(name="metricsRollingStats.timeInMilliseconds", value="15000"),
+									  @HystrixProperty(name="metricsRollingStats.numBuckets", value="5")})
 public class MockRemoteResource {
 
 	//Método com circuit-breaker padrão de 1000ms simulando uma chamada a um recurso externo e finalizando a chamada em 1ms, a chamada é finalizada com sucesso.
